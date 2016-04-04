@@ -1,3 +1,5 @@
+greenlet
+eventlet
 netaddr
 RPI.GPIO
 oslo.config

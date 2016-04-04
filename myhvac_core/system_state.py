@@ -6,6 +6,6 @@ UNKNOWN = -1
 
 
 def print_state(state):
-    states = {HEAT: "Heat", COOL: "Cool", FAN_ONLY: 'Fan Only', UNKNOWN: 'Unknown'}
+    states = {HEAT: "Heat", COOL: "Cool", FAN_ONLY: 'Fan Only', OFF: 'Off', UNKNOWN: 'Unknown'}
 
-    return state.get(state, states[UNKNOWN])
+    return states.get(state, states[UNKNOWN])
