@@ -1,6 +1,6 @@
-greenlet
-eventlet
 netaddr
 RPI.GPIO
 oslo.config
 oslo.log
+MySQL-python
+sqlalchemy
