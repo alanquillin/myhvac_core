@@ -1,6 +1,9 @@
 from myhvac_core.db import models
 
 from datetime import datetime
+import logging
+
+LOG = logging.getLogger(__name__)
 
 
 def get_sensor_measurements(session, **kwargs):
@@ -12,20 +15,30 @@ def insert_sensor_measurement(session, sensor_id, type, data, **kwargs):
         return insert_sensor_temperature(session, sensor_id, data.get('f'), **kwargs)
 
 
-def get_sensor_temperatures(session, order_by=None, limit=None, order_desc=False, **kwargs):
+def _get_sensor_temperatures(session, order_by=None, limit=None, order_desc=False, **kwargs):
     measurement_type = get_measurement_type(session, name='temperature')
     query = session.query(models.Measurement).filter_by(type_id=measurement_type.id, **kwargs)
 
     if order_by:
         if order_desc:
-            query.order_by(order_by.desc())
+            query = query.order_by(order_by.desc())
         else:
-            query.order_by(order_by)
+            query = query.order_by(order_by)
 
     if limit:
-        query.limit(limit)
+        query = query.limit(limit)
 
+    return query
+
+
+def get_sensor_temperatures(session, order_by=None, limit=None, order_desc=False, **kwargs):
+    query = _get_sensor_temperatures(session, order_by=order_by, limit=limit, order_desc=order_desc, **kwargs)
     return query.all()
+
+
+def get_most_recent_sensor_temperature(session, order_by=None, order_desc=None, **kwargs):
+    query = _get_sensor_temperatures(session, order_by=order_by, order_desc=order_desc, **kwargs)
+    return query.first()
 
 
 def insert_sensor_temperature(session, sensor_id, temp, **kwargs):

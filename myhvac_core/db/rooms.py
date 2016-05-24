@@ -13,5 +13,9 @@ def get_rooms(session, **kwargs):
     return _get_rooms(session, **kwargs).all()
 
 
+def get_room_by_id(session, id, **kwargs):
+    return session.query(models.Room).get(id)
+
+
 def get_rooms_dashboard(session, **kwargs):
     return _get_rooms(session, **kwargs)

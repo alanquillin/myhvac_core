@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, DateTime, Boolean, Table
+from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, DateTime, Boolean, Table, Float
 from sqlalchemy.dialects.mysql import BIT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -39,7 +39,7 @@ class Measurement(Base):
     id = Column(BigInteger, primary_key=True)
     sensor_id = Column(Integer, ForeignKey('myhvac_sensors.id'), nullable=False)
     type_id = Column(Integer, ForeignKey('myhvac_measurement_types.id'), nullable=False)
-    measurement = Column(Integer, nullable=False)
+    measurement = Column(Float, nullable=False)
     recorded_date = Column(DateTime, nullable=False)
     measurement_type = relationship(MeasurementType)
 
@@ -49,4 +49,5 @@ class Room(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
     active = Column(BIT, nullable=False)
+    weight = Column(Float, nullable=False)
     sensors = relationship(Sensor)
