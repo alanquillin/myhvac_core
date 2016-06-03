@@ -30,3 +30,19 @@ def init_db():
     engine = create_engine(CONF.db.connection_string)
     Session = sessionmaker()
     Session.configure(bind=engine)
+
+
+def sessionize(f, *args, **kwargs):
+    session = Session()
+
+    ret = None
+    try:
+        ret = f(session, *args, **kwargs)
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+    return ret

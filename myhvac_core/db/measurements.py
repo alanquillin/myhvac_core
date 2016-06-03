@@ -15,7 +15,7 @@ def insert_sensor_measurement(session, sensor_id, type, data, **kwargs):
         return insert_sensor_temperature(session, sensor_id, data.get('f'), **kwargs)
 
 
-def _get_sensor_temperatures(session, order_by=None, limit=None, order_desc=False, **kwargs):
+def _get_sensor_temperatures(session, order_by=None, limit=None, order_desc=False, offset=None, **kwargs):
     measurement_type = get_measurement_type(session, name='temperature')
     query = session.query(models.Measurement).filter_by(type_id=measurement_type.id, **kwargs)
 
@@ -25,15 +25,24 @@ def _get_sensor_temperatures(session, order_by=None, limit=None, order_desc=Fals
         else:
             query = query.order_by(order_by)
 
+    if offset:
+        query = query.offset(offset)
+
     if limit:
         query = query.limit(limit)
 
     return query
 
 
-def get_sensor_temperatures(session, order_by=None, limit=None, order_desc=False, **kwargs):
-    query = _get_sensor_temperatures(session, order_by=order_by, limit=limit, order_desc=order_desc, **kwargs)
+def get_sensor_temperatures(session, order_by=None, limit=None, order_desc=False, offset=None, **kwargs):
+    query = _get_sensor_temperatures(session, order_by=order_by, limit=limit,
+                                     order_desc=order_desc, offset=offset, **kwargs)
     return query.all()
+
+
+def count_sensor_temperatures(session, **kwargs):
+    query = _get_sensor_temperatures(session, **kwargs)
+    return query.count()
 
 
 def get_most_recent_sensor_temperature(session, order_by=None, order_desc=None, **kwargs):
