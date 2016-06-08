@@ -48,27 +48,34 @@ def init_gpio():
 
 
 def get_system_state():
-    is_green_on = GPIO.input(CONF.io.green_pin_fb)
-    is_white_on = GPIO.input(CONF.io.white_pin_fb)
-    is_yellow_on = GPIO.input(CONF.io.yellow_pin_fb)
+    def _get_state(gp, wp, yp):
+        state_ = state.UNKNOWN
+        is_green_on = GPIO.input(gp)
+        is_white_on = GPIO.input(wp)
+        is_yellow_on = GPIO.input(yp)
 
-    if is_green_on and is_white_on and is_yellow_on:
-        return state.COOL
+        if is_green_on and is_white_on and is_yellow_on:
+            state_ = state.COOL
 
-    if is_green_on and is_white_on and not is_yellow_on:
-        return state.HEAT
+        elif is_green_on and is_white_on and not is_yellow_on:
+            stat_ = state.HEAT
 
-    if is_green_on and not is_white_on and not is_yellow_on:
-        return state.FAN_ONLY
+        elif is_green_on and not is_white_on and not is_yellow_on:
+            state_ = state.FAN_ONLY
 
-    if not is_green_on and not is_white_on and not is_yellow_on:
-        return state.OFF
+        elif not is_green_on and not is_white_on and not is_yellow_on:
+            state_ = state.OFF
 
-    return state.UNKNOWN
+        return state_
+
+    return (_get_state(CONF.io.green_pin_fb, CONF.io.white_pin_fb, CONF.io.yellow_pin_fb),
+            _get_state(CONF.io.green_pin_lb, CONF.io.white_pin_lb, CONF.io.yellow_pin_lb))
 
 
 def set_system_state(to_state, current_state):
     if to_state == state.UNKNOWN:
+        LOG.error('Trying to set system status UNKNOWN.... Uncool... bailing.  Current state: %s',
+                  state.print_state(current_state))
         return
 
     def _set_system_state(s):
@@ -84,7 +91,7 @@ def set_system_state(to_state, current_state):
 
         # Verify that the system state was set currently
         threading._sleep(1)
-        cs = get_system_state()
+        cs, _ = get_system_state()
         if s != cs:
             LOG.error('The system state was not set correctly!  Expected state: %s, Actual state: %s',
                       state.print_state(s), state.print_state(cs))
